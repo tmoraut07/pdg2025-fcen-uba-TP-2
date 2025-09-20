@@ -5,7 +5,7 @@
 //
 // Faces.hpp
 //
-// Written by: <Your Name>
+// Written by: <Tobias Moraut>
 //
 // Software developed for the course
 // Digital Geometry Processing
@@ -38,6 +38,8 @@
 #define _FACES_HPP_
 
 #include <vector>
+#include<algorithm>
+
 
 using namespace std;
 
@@ -45,7 +47,7 @@ class Faces {
   
 public:
           Faces(const int nV, const vector<int>& coordIndex);
-
+ 
   // The constructor should compare the nV value passed as a parameter
   // with the non-negative values in stored in the coordIndex index
   // array, and update the value of nV stored internally if
@@ -88,6 +90,10 @@ public:
   int     getNextCorner(const int iC)              const;
 
 private:
+  int _numVertices;
+  vector<int> _indices; // hacer que en vez de -1 diga -(numero de cara)
+  // agregar vector que apunte a cada principio de cara
+  vector<int> _cacheIndices;
 
   // TODO
 

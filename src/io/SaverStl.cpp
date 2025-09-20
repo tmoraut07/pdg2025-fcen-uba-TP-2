@@ -5,7 +5,7 @@
 //
 // SaverStl.cpp
 //
-// Written by: <Your Name>
+// Written by: <Tobias Moraut>
 //
 // Software developed for the course
 // Digital Geometry Processing
@@ -71,10 +71,41 @@ bool SaverStl::_saveAscii
   float x0,x1,x2,n0,n1,n2;
   for(iF=0;iF<nF;iF++) { // for each face ...
 
+    iN = (npf_indexed)? normalIndex[iF] : iF;
+    float nx = normal[3*iN  ];
+    float ny = normal[3*iN+1];
+    float nz = normal[3*iN+2];
+
+    iV0 = coordIndex[4*iF+0];
+    iV1 = coordIndex[4*iF+1];
+    iV2 = coordIndex[4*iF+2];
+
+    float x0 = coord[3*iV0  ];
+    float y0 = coord[3*iV0+1];
+    float z0 = coord[3*iV0+2];
+
+    float x1 = coord[3*iV1  ];
+    float y1 = coord[3*iV1+1];
+    float z1 = coord[3*iV1+2];
+
+    float x2 = coord[3*iV2  ];
+    float y2 = coord[3*iV2+1];
+    float z2 = coord[3*iV2+2];
+
+    fprintf(fp,"  facet normal %g %g %g\n",nx,ny,nz);
+    fprintf(fp,"    outer loop\n");
+    fprintf(fp,"      vertex %g %g %g\n",x0,y0,z0);
+    fprintf(fp,"      vertex %g %g %g\n",x1,y1,z1);
+    fprintf(fp,"      vertex %g %g %g\n",x2,y2,z2);
+    fprintf(fp,"    endloop\n");
+    fprintf(fp,"  endfacet\n");
+
     // TODO
     // use fprintf() to print formatted text
 
   }
+
+  fprintf(fp,"endsolid %s\n",solidname);
 
   return true;
 }

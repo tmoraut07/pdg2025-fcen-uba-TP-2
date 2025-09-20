@@ -5,7 +5,7 @@
 //
 // Faces.cpp
 //
-// Written by: <Your Name>
+// Written by: <Tobias Moraut>
 //
 // Software developed for the course
 // Digital Geometry Processing
@@ -38,46 +38,95 @@
 #include "Faces.hpp"
   
 Faces::Faces(const int nV, const vector<int>& coordIndex) {
-  // TODO
+    _indices = coordIndex;
+    vector<int> _cacheIndices;
+    _numVertices = nV;
+    _cacheIndices.push_back(0);
+    int nextFace = 1;
+    for (int i =0 ; i < _indices.size(); i++){
+        if(coordIndex[i] < 0){
+            _cacheIndices.push_back(i + 1);
+            _indices[i] = - nextFace;
+            nextFace++;
+        }
+    }
+    _indices[_indices.size() - 1] = -nextFace;
 }
 
 int Faces::getNumberOfVertices() const {
-  // TODO
-  return 0;
-}
+  return _numVertices;
+}  
 
 int Faces::getNumberOfFaces() const {
-  // TODO
-  return 0;
+    return _cacheIndices.size();
 }
 
 int Faces::getNumberOfCorners() const {
-  // TODO
-  return 0;
+  return _indices.size();
 }
 
 int Faces::getFaceSize(const int iF) const {
-  // TODO
-  return 0;
+  int numFaces = getNumberOfFaces();
+    if(iF < 0 || iF >= numFaces) 
+        return -1;
+
+    int faceIndex = getFaceFirstCorner(iF);
+    int faceSizeCounter = 0;
+    while(_indices[faceIndex + faceSizeCounter] >= 0){
+        faceSizeCounter++;
+    }
+    return faceSizeCounter;
 }
 
 int Faces::getFaceFirstCorner(const int iF) const {
-  // TODO
-  return -1;
+    int numFaces = getNumberOfFaces();
+    if(iF < 0 || iF >= numFaces)
+        return -1;
+
+    int faceIndex = _cacheIndices[iF];
+    return -1; 
 }
 
 int Faces::getFaceVertex(const int iF, const int j) const {
-  // TODO
-  return -1;
+  int numFaces = getNumberOfFaces();
+  if(iF < 0 || iF >= numFaces) 
+        return -1;
+
+  int faceIndex = getFaceFirstCorner(iF);
+  int faceSize = getFaceSize(iF);
+
+  if(j <= faceSize && j >= 0){
+    return _indices[faceIndex + j];
+  }
+  else return -1;
 }
 
 int Faces::getCornerFace(const int iC) const {
-  // TODO
-  return -1;
+  if(iC < 0 || iC >= _indices.size())
+    return -1;
+
+  int faceCount = 0;
+  for(int i = 0; i < iC; i++){
+    if(_indices[i] == -1)
+      faceCount++;
+  }
+  return faceCount;
 }
 
 int Faces::getNextCorner(const int iC) const {
-  // TODO
-  return -1;
+    if (iC >= _indices.size()){
+        return -1;
+    }
+
+    if (_indices[iC] < 0){
+        return -1;
+    }
+
+    int nextCorner = _indices[iC + 1];
+    if(nextCorner < 0){
+        return _cacheIndices[-nextCorner - 1];
+    } else{
+        return iC + 1;
+    }
 }
 
