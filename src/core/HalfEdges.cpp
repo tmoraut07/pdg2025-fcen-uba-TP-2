@@ -45,6 +45,8 @@
 #include "HalfEdges.hpp"
 #include "Graph.hpp"
 
+#include "../io/StrException.hpp"
+
 // 1) all half edges corresponding to regular mesh edges are made twins
 // 2) all the other edges are made boundary half edges (twin==-1)
 
@@ -81,6 +83,11 @@ HalfEdges::HalfEdges(const int nVertices, const vector<int>&  coordIndex):
   //    nV, and then use the method Edges::_reset() to adjust the
   //    number of vertices of the graph, if necessary; or you can
   //    abort throwing an StrException
+  // ^
+  for (int i = 0; i < coordIndex.size(); i++){
+    if(coordIndex[i] < -1 || _coordIndex[i] >= nVertices) throw new StrException("Invalid Corner");
+  }
+  
   
   // 1) create an empty vector<int> to count the number of incident
   //    faces per edge; size is not known at this point because the
