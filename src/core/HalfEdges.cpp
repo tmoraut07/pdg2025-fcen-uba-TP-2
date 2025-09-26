@@ -332,7 +332,7 @@ int HalfEdges::getEdgeHalfEdge(const int iE, const int j) const {
   int numberOfHalfEdges = getNumberOfEdgeHalfEdges(iE);    // We check here if iE is a valid edge
 
   int halfEdge = -1;
-  if(j <= numberOfHalfEdges){
+  if(j < numberOfHalfEdges){
     halfEdge = _firstCornerEdge[iE] + j;
   }
   return -1;

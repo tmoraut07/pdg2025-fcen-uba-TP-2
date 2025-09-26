@@ -58,15 +58,44 @@ PolygonMesh::PolygonMesh(const int nVertices, const vector<int>& coordIndex):
   for(iV=0;iV<nV;iV++)
     _isBoundaryVertex.push_back(false);
   // TODO
-  // - for edge boundary iE label its two end vertices as boundary 
+
+  // - for edge boundary iE label its two end vertices as boundary
+  int iE = 0;
+  int numberOfHalfEdges;
+
+  for(iE; iE < nE; iE++){
+    numberOfHalfEdges = getNumberOfEdgeHalfEdges(iE);
+
+    if(numberOfHalfEdges == 1){
+      _isBoundaryVertex[getVertex0(iE)] = true;
+      _isBoundaryVertex[getVertex1(iE)] = true;
+    }
+  }
+
+
   
   // 2) create a partition of the corners in the stack
   Partition partition(nC);
   // 3) for each regular edge
-  //    - get the two half edges incident to the edge
-  //    - join the two pairs of corresponding corners accross the edge
-  //    - you need to take into account the relative orientation of
-  //      the two incident half edges
+  int halfEdge1;
+  int halfEdge2;
+  int numberOfEdgeHalfEdges;
+  for(iE = 0; iE < nE; iE++){
+    numberOfEdgeHalfEdges = getNumberOfEdgeHalfEdges(iE);
+    
+    if(numberOfEdgeHalfEdges == 2){
+      // - get the two half edges incident to the edge
+      halfEdge1 = getEdgeHalfEdge(iE, 0);
+      halfEdge2 = getEdgeHalfEdge(iE, 1);
+
+      //  join the two pairs of corresponding corners accross the edge
+      //  - you need to take into account the relative orientation of
+      //  the two incident half edges
+      partition.join(halfEdge1, getNext(halfEdge2));
+      partition.join(halfEdge2, getNext(halfEdge1));
+    }
+  }
+
 
   // consistently oriented
   /* \                  / */
@@ -94,6 +123,23 @@ PolygonMesh::PolygonMesh(const int nVertices, const vector<int>& coordIndex):
   
   // 4) count number of parts per vertex
   //    - initialize _nPartsVertex array to 0's
+  for(iV = 0; iV < nV; iV++){
+    _nPartsVertex[iV] = 0;
+  }
+
+  int iP;
+  int partitionSize = partition.getNumberOfParts();
+  vector<bool> visited(partitionSize, false);
+  for(int iC = 0; iC < nC; iC++){
+    if(_coordIndex[iC] >= 0 && partition.find(iC) != -1){
+      iP = partition.find(iC);
+
+      if(!visited[iP]){
+        _nPartsVertex[_coordIndex[iC]]++;
+        visited[iP] = true;
+      }
+    }
+  }
   //    - for each corner iC which is a representative of its subset, 
   //    - get the corresponding vertex index iV and increment _nPartsVertex[iV]
   //    - note that all the corners in each subset share a common
